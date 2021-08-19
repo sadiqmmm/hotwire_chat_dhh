@@ -14,11 +14,17 @@ class MessagesController < ApplicationController
   def create
     @room = Room.find(params[:room_id])
     @message = @room.messages.build(message_params)
-    if @message.save
-      flash[:success] = 'Message created successfully.'
-      redirect_to @room
-    else
-      render :new
+
+    respond_to do |format|
+      if @message.save
+        format.turbo_stream
+        format.html do
+          flash[:success] = 'Message created successfully.'
+          redirect_to @room
+        end
+      else
+        render :new
+      end
     end
   end
 
